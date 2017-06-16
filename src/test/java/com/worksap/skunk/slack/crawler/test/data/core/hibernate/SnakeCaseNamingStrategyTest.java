@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import com.worksap.skunk.slack.crawler.data.core.hibernate.SnakeCaseNamingStrategy;
+import skunk.slack.crawler.data.core.hibernate.SnakeCaseNamingStrategy;
 
 public class SnakeCaseNamingStrategyTest {
 	@Test

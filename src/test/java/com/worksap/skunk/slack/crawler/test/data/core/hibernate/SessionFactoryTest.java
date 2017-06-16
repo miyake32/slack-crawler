@@ -13,15 +13,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.worksap.skunk.slack.crawler.data.core.hibernate.SessionFactory;
+import skunk.slack.crawler.data.core.hibernate.SessionFactory;
+import skunk.slack.crawler.data.entity.model.Channel;
+import skunk.slack.crawler.data.entity.model.User;
 
 
 
 public class SessionFactoryTest {
-	// must change when adding entity class
-	int NUM_OF_ENTITY_CLASSES = 4;
 	@Test
 	public void openSession() throws HibernateException, IOException {
 		Session session = SessionFactory.openSession();
@@ -37,6 +36,8 @@ public class SessionFactoryTest {
 		Configuration configuration = mock(Configuration.class);
 		setEntities.invoke(null, configuration);
 		
-		verify(configuration, times(NUM_OF_ENTITY_CLASSES)).addAnnotatedClass(Mockito.any(Class.class));
+		verify(configuration, times(1)).addAnnotatedClass(Channel.class);
+		verify(configuration, times(1)).addAnnotatedClass(User.class);
+
 	}
 }
