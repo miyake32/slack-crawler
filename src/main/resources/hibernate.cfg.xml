@@ -5,7 +5,7 @@
 
 <hibernate-configuration>
 	<session-factory>
-		<property name="connection.url">jdbc:h2:~/slack-crawler</property>
+		<property name="connection.url">jdbc:h2:~/slack-crawler;AUTO_SERVER=TRUE</property>
 		<property name="connection.username"></property>
 		<property name="connection.password"></property>
 	</session-factory>

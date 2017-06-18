@@ -21,15 +21,12 @@ public class SessionFactory {
 	private static String ENTITY_PACKAGE = "skunk.slack.crawler.data.entity";
 
 	public static Session openSession() throws HibernateException, IOException {
-		if (Objects.nonNull(sessionFactory)) {
-			return sessionFactory.openSession();
-		}
 		synchronized (lock) {
-			if (Objects.isNull(sessionFactory)) {
+			if (Objects.isNull(sessionFactory) || sessionFactory.isClosed()) {
 				sessionFactory = configure().buildSessionFactory();
 			}
-			return sessionFactory.openSession();
 		}
+		return sessionFactory.openSession();
 	}
 
 	private static Configuration configure() throws IOException {
@@ -44,30 +41,20 @@ public class SessionFactory {
 	}
 
 	private static void setEntities(Configuration configuration) throws IOException {
-		getClassesUnder(ENTITY_PACKAGE)
-			.filter(Objects::nonNull)
-			.filter(clazz -> clazz.isAnnotationPresent(Entity.class))
-			.forEach(clazz -> {
-				log.info("added entity class {}", clazz.getName());
-				configuration.addAnnotatedClass(clazz);
+		getClassesUnder(ENTITY_PACKAGE).filter(Objects::nonNull)
+				.filter(clazz -> clazz.isAnnotationPresent(Entity.class)).forEach(clazz -> {
+					log.info("added entity class {}", clazz.getName());
+					configuration.addAnnotatedClass(clazz);
 				});
 	}
-	
+
 	private static Stream<Class<?>> getClassesUnder(String packageName) throws IOException {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		try {
-			return ClassPath.from(loader).getTopLevelClassesRecursive(packageName)
-					.stream().map(info -> info.load());
+			return ClassPath.from(loader).getTopLevelClassesRecursive(packageName).stream().map(info -> info.load());
 		} catch (IOException e) {
 			log.error("Error occurred while loading classes under {}", packageName);
 			throw e;
 		}
-	}
-	
-	public static void closeSession() {
-		if (Objects.isNull(sessionFactory) || sessionFactory.isClosed()) {
-			return;
-		}
-		sessionFactory.close();
 	}
 }

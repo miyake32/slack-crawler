@@ -11,13 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import skunk.slack.crawler.data.entity.type.ChannelType;
 
 @Entity
 @Data
-@Builder
+// use deprecated annotation for the compatibility with development env. 
+@lombok.experimental.Builder
 @AllArgsConstructor
 public class Channel implements Serializable {
 	private static final long serialVersionUID = -2313544115011327045L;

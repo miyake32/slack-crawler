@@ -18,7 +18,7 @@ import skunk.slack.crawler.data.dao.spec.EntityDao;
 public abstract class AbstractEntityDaoHibernateImpl<E> implements EntityDao<E> {
 	public void save(Collection<E> entities) {
 		Transaction tx = null;
-		try (Session session = SessionFactory.openSession()) {
+		try (Session session = SessionFactory.openSession();) {
 			tx = session.beginTransaction();
 			entities.stream().forEach(msg -> session.save(msg));
 			tx.commit();
@@ -33,7 +33,7 @@ public abstract class AbstractEntityDaoHibernateImpl<E> implements EntityDao<E> 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	public Set<E> getAll() {
-		try (Session session = SessionFactory.openSession()) {
+		try (Session session = SessionFactory.openSession();) {
 			return (Set<E>) session.createCriteria(getEntityClass()).list().stream().collect(Collectors.toSet());
 		} catch (HibernateException | IOException e) {
 			log.error("Failed to get all records of {}", getEntityClass().getSimpleName(), e);

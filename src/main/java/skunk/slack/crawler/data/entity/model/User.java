@@ -7,12 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 @Entity
 @Data
-@Builder
+//use deprecated annotation for the compatibility with development env. 
+@lombok.experimental.Builder
 @AllArgsConstructor
 public class User implements Serializable {
 	private static final long serialVersionUID = -3696088134503445149L;

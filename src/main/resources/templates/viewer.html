@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>SlackViewer</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+<script src="https://use.fontawesome.com/c230867484.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>
+<script src="js/viewer.js"></script>
+
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-3">
+				<div id="channels" class="list-group">
+					<a th:each="channel: ${channels}" th:href="'#' + ${channel.name}"
+						th:id="'channel-' + ${channel.id}"
+						class="list-group-item list-group-item-action"><i
+						th:if="${channel.type == 'PUBLIC_CHANNEL'}" class="fa fa-slack"
+						aria-hidden="true"></i><i
+						th:if="${channel.type == 'PRIVATE_CHANNEL'}" class="fa fa-key"
+						aria-hidden="true"></i> <i
+						th:if="${channel.type} == 'MULTI_PARTY_DIRECT_MESSAGE'"
+						class="fa fa-users" aria-hidden="true"></i><i
+						th:if="${channel.type} == 'DIRECT_MESSAGE'" class="fa fa-user"
+						aria-hidden="true"></i><span th:text="${channel.name}"
+						style="margin-left: 3px" /> </a>
+				</div>
+			</div>
+			<div class="col-sm-9">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 id="active-channel-name" class="panel-title"></h3>
+					</div>
+					<div id="messages" class="panel-body"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

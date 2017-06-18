@@ -13,13 +13,13 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import skunk.slack.crawler.util.TimeStampUtils;
 
 @Entity
 @Data
-@Builder
+//use deprecated annotation for the compatibility with development env. 
+@lombok.experimental.Builder
 @AllArgsConstructor
 public class Reply implements Serializable, Comparable<Reply> {
 	private static final long serialVersionUID = 3292105374614204876L;

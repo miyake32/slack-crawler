@@ -19,12 +19,12 @@ public class MessageDaoHibernateImpl extends AbstractEntityDaoHibernateImpl<Mess
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
-	public List<Message> getFromLatest(Channel channel, Integer count, String lastFetchedTs) {
-		try {
-			Session session = SessionFactory.openSession();
+	public List<Message> getInRange(Channel channel, Integer count, String maxTs) {
+		try (Session session = SessionFactory.openSession();) {
 			return session.createCriteria(Message.class).add(Restrictions.eq("channel", channel))
-					.addOrder(Order.desc("ts")).list();
+					.add(Restrictions.le("ts", maxTs)).addOrder(Order.desc("ts")).setMaxResults(count).list();
 		} catch (HibernateException | IOException e) {
+			log.error("Failed to retrieve messages [channel:{},count:{},maxTs:{}]", channel.getName(), count, maxTs);
 			log.error("", e);
 			return null;
 		}
