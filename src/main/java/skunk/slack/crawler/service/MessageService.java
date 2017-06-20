@@ -22,7 +22,7 @@ public class MessageService {
 	
 	public List<Message> getMessages(String channelId, int count, String maxTs) {
 		Channel channel = channelService.getChannel(channelId);
-		return dao.getInRange(channel, 30, maxTs);
+		return dao.getInRange(channel, count, maxTs);
 	}
 	
 	public List<Message> getMessages(String channelId, int count) {

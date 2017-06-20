@@ -23,11 +23,15 @@ public class SlackCrawler {
 		Set<Channel> channels = ServiceFactory.getChannelService().fetchChannels(c -> c.getIsMember());
 		System.out.println(channels.size());
 		for (Channel channel : channels) {
+			try {
 			log.info("start collect messages in {}", channel.getName());
 			List<Message> messages = ServiceFactory.getSlackClient().getMessages(channel).getList();
 			log.info("start save {} messages in {}", messages.size(), channel.getName());
 			ServiceFactory.getMessageService().save(messages);
 			log.info("Finish");
+			} catch (Exception e) {
+				log.error("Error occurred while fetching {}", channel.getName(), e);
+			}
 		}
 	}
 }
