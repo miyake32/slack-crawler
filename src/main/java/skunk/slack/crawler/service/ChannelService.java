@@ -28,6 +28,7 @@ public class ChannelService {
 		Map<String, Channel> channels = channelDao.getAll().stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
 		List<Channel> fetchedChannels = slackClient.getPublicChannels().getList();
 		fetchedChannels.addAll(slackClient.getPrivateChannels().getList());
+		fetchedChannels.addAll(slackClient.getDirectMessages().getList());
 		return fetchedChannels.stream().map(c -> {
 			Channel savedChannel = channels.get(c.getId());
 			if (Objects.nonNull(savedChannel)) {

@@ -2,7 +2,7 @@
  * 
  */
 var getMessage = function(channelId, currentMinTs) {
-	$.ajax('getMessages', {
+	$.ajax('/slack-crawler/getMessages', {
 		'type' : 'GET',
 		'dataType' : 'json',
 		data : {
@@ -23,6 +23,7 @@ var getMessage = function(channelId, currentMinTs) {
 							$message);
 					$('#messages').prepend($messageContainer);
 				});
+				$('#messages').animate({ scrollTop: $('#messages')[0].scrollHeight }, 0);
 			});
 }
 
@@ -36,7 +37,6 @@ var toHtml = function(messageText, referencedUsers) {
 	}
 	for (var i in matches) {
 		var user = users[matches[i].replace(/<@([A-Za-z0-9]+)(\|.*)?>/, '$1')];
-		console.log(matches[i].replace(/<@([A-Za-z0-9]+)(\|.*)?>/, '$1'));
 		messageText = messageText.replace(matches[i], '<a>@' + user.name + '</a>');
 	}
 	return messageText.replace(/\r?\n/g, '<br/>');
@@ -68,5 +68,5 @@ $(document).ready(function() {
 	}
 	
 	// start crawling
-	$.ajax('crawler/enable');
+	$.ajax('/slack-crawler/crawler/enable');
 });

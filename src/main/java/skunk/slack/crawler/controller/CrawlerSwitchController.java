@@ -13,7 +13,7 @@ import spark.Spark;
 
 class CrawlerSwitchController implements Controller {
 	private static String CRAWLER_TASK_KEY = "SLACK_CRAWLER";
-	private static int MINS_INTERVAL = 60;
+	private static int MINS_INTERVAL = 120;
 
 	@Override
 	public void setRoutes() {

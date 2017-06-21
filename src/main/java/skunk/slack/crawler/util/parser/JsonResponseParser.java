@@ -24,6 +24,7 @@ public class JsonResponseParser {
 
 	public static <E> JsonResponseParseResult<E> parseResponse(InputStream input, SlackAPISpec<E> responseConverter)
 			throws IOException {
+		log.info("Parse response with {}", responseConverter.getClass().getName());
 		InputStreamReader isr = new InputStreamReader(input);
 		JsonReader reader = new JsonReader(isr);
 		Map<String, JsonElementType> structure = responseConverter.getJsonResponseStructure();

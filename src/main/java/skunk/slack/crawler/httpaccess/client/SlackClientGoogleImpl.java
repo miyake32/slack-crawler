@@ -21,6 +21,8 @@ import skunk.slack.crawler.httpaccess.api.spec.ChannelsHistory;
 import skunk.slack.crawler.httpaccess.api.spec.ChannelsList;
 import skunk.slack.crawler.httpaccess.api.spec.GroupsHistory;
 import skunk.slack.crawler.httpaccess.api.spec.GroupsList;
+import skunk.slack.crawler.httpaccess.api.spec.ImHistory;
+import skunk.slack.crawler.httpaccess.api.spec.ImList;
 import skunk.slack.crawler.httpaccess.api.spec.SlackAPISpec;
 import skunk.slack.crawler.httpaccess.api.spec.UsersList;
 import skunk.slack.crawler.service.ServiceFactory;
@@ -67,24 +69,24 @@ public class SlackClientGoogleImpl implements SlackClient {
 
 	@Override
 	public JsonResponseParseResult<Channel> getDirectMessages() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		return getChannel(ChannelType.DIRECT_MESSAGE);
 
-	@Override
-	public JsonResponseParseResult<Channel> getMultipartyDirectMessages() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private JsonResponseParseResult<Channel> getChannel(ChannelType type) {
 		SlackAPISpec<Channel> spec = null;
 		switch (type) {
 		case PUBLIC_CHANNEL:
+			log.info("Fetch public channels");
 			spec = new ChannelsList();
 			break;
 		case PRIVATE_CHANNEL:
+			log.info("Fetch private channels and multi-party direct messages");
 			spec = new GroupsList();
+			break;
+		case DIRECT_MESSAGE:
+			log.info("Fetch direct messages");
+			spec = new ImList();
 			break;
 		default:
 			break;
@@ -114,6 +116,9 @@ public class SlackClientGoogleImpl implements SlackClient {
 		case PRIVATE_CHANNEL:
 		case MULTIPARTY_DIRECT_MESSAGE:
 			spec = new GroupsHistory(userService);
+			break;
+		case DIRECT_MESSAGE:
+			spec = new ImHistory(userService);
 			break;
 		}
 		log.info("Start to retrieve channel {}", channel.getName());

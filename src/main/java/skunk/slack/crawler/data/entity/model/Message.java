@@ -50,6 +50,7 @@ public class Message implements Serializable, Comparable<Message> {
 	private Timestamp timeStamp;
 
 	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@Column(nullable = true)
 	private Set<User> referencedUsers;
 
 	public void setChannel(Channel channel) {

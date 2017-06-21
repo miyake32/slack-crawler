@@ -10,6 +10,5 @@ public interface SlackClient {
 	public JsonResponseParseResult<Channel> getPublicChannels();
 	public JsonResponseParseResult<Channel> getPrivateChannels();
 	public JsonResponseParseResult<Channel> getDirectMessages();
-	public JsonResponseParseResult<Channel> getMultipartyDirectMessages();
 	public JsonResponseParseResult<Message> getMessages(Channel channel);
 }

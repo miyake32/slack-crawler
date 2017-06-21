@@ -17,7 +17,7 @@ import skunk.slack.crawler.data.entity.model.User;
 import skunk.slack.crawler.service.UserService;
 import skunk.slack.crawler.util.parser.JsonElementType;
 
-public class GroupsHistory implements SlackAPISpec<Message> {
+public class ImHistory implements SlackAPISpec<Message> {
 	private static final Map<String, JsonElementType> RESPONSE_STRUCTURE = ImmutableMap
 			.<String, JsonElementType> builder().put("ok", JsonElementType.BOOLEAN)
 			.put("has_more", JsonElementType.BOOLEAN).put("messages", JsonElementType.ARRAY_OF_TARGET_OBJECT).build();
@@ -45,7 +45,7 @@ public class GroupsHistory implements SlackAPISpec<Message> {
 	};
 	private UserService userFetchService;
 
-	public GroupsHistory(UserService userFetchService) {
+	public ImHistory(UserService userFetchService) {
 		this.userFetchService = userFetchService;
 	}
 
@@ -61,7 +61,7 @@ public class GroupsHistory implements SlackAPISpec<Message> {
 
 	@Override
 	public String getApiMethod() {
-		return "groups.history";
+		return "im.history";
 	}
 
 	@Override

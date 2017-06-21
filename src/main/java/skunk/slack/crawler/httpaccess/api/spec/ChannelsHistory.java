@@ -23,9 +23,7 @@ public class ChannelsHistory implements SlackAPISpec<Message> {
 			.put("has_more", JsonElementType.BOOLEAN).put("messages", JsonElementType.ARRAY_OF_TARGET_OBJECT).build();
 	private final Function<JsonObject, Message> converter = obj -> {
 		String text = obj.get("text").getAsString();
-		Message message = Message.builder()
-				.type(obj.get("type").getAsString())
-				.ts(obj.get("ts").getAsString())
+		Message message = Message.builder().type(obj.get("type").getAsString()).ts(obj.get("ts").getAsString())
 				.text(text).build();
 		JsonElement user = obj.get("user");
 		if (Objects.nonNull(user)) {
@@ -35,7 +33,10 @@ public class ChannelsHistory implements SlackAPISpec<Message> {
 		Matcher userRefMatches = userRefPattern.matcher(text);
 		Set<User> referencedUsers = new HashSet<>();
 		while (userRefMatches.find()) {
-			referencedUsers.add(this.userFetchService.getUser(userRefMatches.group(1)));
+			User referencedUser = this.userFetchService.getUser(userRefMatches.group(1));
+			if (Objects.nonNull(referencedUser)) {
+				referencedUsers.add(referencedUser);
+			}
 		}
 		message.setReferencedUsers(referencedUsers);
 		return message;
