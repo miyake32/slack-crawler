@@ -36,6 +36,10 @@ public class ModelCreator {
 	private ModelCreator() {
 	}
 
+	public static String createJsonModelFromCollectionOfMap(Collection<Map<String, Object>> arrayOfMap) {
+		return gson.toJson(arrayOfMap);
+	}
+	
 	public static String createJsonModelFromCollection(Collection<?> arrayOfObj) {
 		return gson.toJson(createModelFromCollection(arrayOfObj));
 	}

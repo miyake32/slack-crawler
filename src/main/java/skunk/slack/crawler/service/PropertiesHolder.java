@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SlackCrawlerPropertiesHolder {
+public class PropertiesHolder {
 	private static Properties PROPERTIES = null;
 	private static final String FILE = "slack-crawler.properties";
 

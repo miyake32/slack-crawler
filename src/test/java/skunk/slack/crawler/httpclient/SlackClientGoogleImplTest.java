@@ -12,11 +12,11 @@ import skunk.slack.crawler.data.entity.model.User;
 import skunk.slack.crawler.data.entity.type.ChannelType;
 import skunk.slack.crawler.httpaccess.client.SlackClient;
 import skunk.slack.crawler.httpaccess.client.SlackClientGoogleImpl;
-import skunk.slack.crawler.service.SlackCrawlerPropertiesHolder;
+import skunk.slack.crawler.service.PropertiesHolder;
 
 public class SlackClientGoogleImplTest {
-	SlackClient client = new SlackClientGoogleImpl(SlackCrawlerPropertiesHolder.getTeamUrl(),
-			SlackCrawlerPropertiesHolder.getToken());
+	SlackClient client = new SlackClientGoogleImpl(PropertiesHolder.getTeamUrl(),
+			PropertiesHolder.getToken());
 
 	@Test
 	public void getUsersTest() {
@@ -40,12 +40,8 @@ public class SlackClientGoogleImplTest {
 	@Test
 	public void getMessagesTest1() {
 		Channel channel = client.getPublicChannels().getList()
-							.stream().filter(c -> c.getIsMember())//.findAny().get();
-							.collect(Collectors.toList()).get(10);
+							.stream().filter(c -> c.getIsMember()).findAny().get();
 		List<Message> messages = client.getMessages(channel).getList();
 		Assert.assertNotEquals(0, messages.size());
-
-		Message message = messages.stream().findAny().get();
-		System.out.println(message);
 	}
 }

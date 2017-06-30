@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 
+import lombok.extern.slf4j.Slf4j;
 import skunk.slack.crawler.data.entity.model.Channel;
 import skunk.slack.crawler.data.entity.model.Message;
+import skunk.slack.crawler.service.PropertiesHolder;
 import skunk.slack.crawler.service.ServiceFactory;
-import skunk.slack.crawler.service.SlackCrawlerPropertiesHolder;
+import skunk.slack.crawler.util.MessageProcessor;
 import skunk.slack.crawler.util.ModelCreator;
 import skunk.slack.crawler.util.TimeStampUtils;
 import spark.ModelAndView;
@@ -25,12 +27,11 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 public class ViewerController implements Controller {
 	private TemplateViewRoute getViewer(Set<String> channelNames) {
-		List<Channel> channels = ServiceFactory.getChannelService().getChannels()
-									.stream()
-									.filter(c -> Objects.isNull(channelNames) || channelNames.contains(c.getName()))
-									.sorted((a, b) -> a.getType().compareTo(b.getType()) * 100 + a.getName().compareTo(b.getName()))
-									.collect(Collectors.toList());
-				return new TemplateViewRoute() {
+		List<Channel> channels = ServiceFactory.getChannelService().getChannels().stream()
+				.filter(c -> Objects.isNull(channelNames) || channelNames.contains(c.getName()))
+				.sorted((a, b) -> a.getType().compareTo(b.getType()) * 100 + a.getName().compareTo(b.getName()))
+				.collect(Collectors.toList());
+		return new TemplateViewRoute() {
 			@Override
 			public ModelAndView handle(Request request, Response response) throws Exception {
 				Map<String, Object> model = new HashMap<>();
@@ -52,15 +53,26 @@ public class ViewerController implements Controller {
 			} else {
 				maxTs = TimeStampUtils.decrementTs(currentMinTs);
 			}
-			List<Message> messages = ServiceFactory.getMessageService().getMessages(channelId, 1000, maxTs);
-			return ModelCreator.createJsonModelFromCollection(messages);
+			List<Message> messages = ServiceFactory.getMessageService().getMessages(channelId, 30, maxTs);
+			List<Map<String, Object>> model = messages.stream().map(m -> {
+				Map<String, Object> map = new HashMap<>();
+				if (Objects.nonNull(m.getUser())) {
+					map.put("user", m.getUser().getName());
+					map.put("userRealName", m.getUser().getRealName());
+				}
+				map.put("ts", m.getTs());
+				map.put("type", m.getType());
+				map.put("text", MessageProcessor.toHtml(m));
+				return map;
+			}).collect(Collectors.toList());
+			return ModelCreator.createJsonModelFromCollectionOfMap(model);
 		}
 	};
 
 	@Override
 	public void setRoutes() {
-		Spark.get("/", getViewer(SlackCrawlerPropertiesHolder.getOpenChannels()), new ThymeleafTemplateEngine());
-		Spark.get("/secret/" + SlackCrawlerPropertiesHolder.getToken(), getViewer(null), new ThymeleafTemplateEngine());
+		Spark.get("/", getViewer(PropertiesHolder.getOpenChannels()), new ThymeleafTemplateEngine());
+		Spark.get("/secret/" + PropertiesHolder.getToken(), getViewer(null), new ThymeleafTemplateEngine());
 		Spark.get("/getMessages", getMessages);
 	}
 }

@@ -26,7 +26,7 @@ import skunk.slack.crawler.httpaccess.api.spec.ImList;
 import skunk.slack.crawler.httpaccess.api.spec.SlackAPISpec;
 import skunk.slack.crawler.httpaccess.api.spec.UsersList;
 import skunk.slack.crawler.service.ServiceFactory;
-import skunk.slack.crawler.service.UserService;
+import skunk.slack.crawler.service.data.UserService;
 import skunk.slack.crawler.util.TimeStampUtils;
 import skunk.slack.crawler.util.parser.JsonResponseParseResult;
 import skunk.slack.crawler.util.parser.JsonResponseParser;

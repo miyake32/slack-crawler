@@ -1,4 +1,4 @@
-package skunk.slack.crawler.service;
+package skunk.slack.crawler.service.data;
 
 import java.util.List;
 import java.util.Map;

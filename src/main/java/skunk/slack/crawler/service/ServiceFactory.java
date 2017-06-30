@@ -6,9 +6,12 @@ import skunk.slack.crawler.data.dao.impl.ChannelDaoHibernateImpl;
 import skunk.slack.crawler.data.dao.impl.UserDaoHibernateImpl;
 import skunk.slack.crawler.httpaccess.client.SlackClient;
 import skunk.slack.crawler.httpaccess.client.SlackClientGoogleImpl;
+import skunk.slack.crawler.service.data.ChannelService;
+import skunk.slack.crawler.service.data.MessageService;
+import skunk.slack.crawler.service.data.UserService;
 
 public class ServiceFactory {
-	private static SlackClient slackClient = new SlackClientGoogleImpl(SlackCrawlerPropertiesHolder.getTeamUrl(), SlackCrawlerPropertiesHolder.getToken());
+	private static SlackClient slackClient = new SlackClientGoogleImpl(PropertiesHolder.getTeamUrl(), PropertiesHolder.getToken());
 	private static ChannelService channelService = null;
 	private static MessageService messageService = null;
 	private static UserService userService = null;

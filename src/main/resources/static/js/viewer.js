@@ -1,7 +1,12 @@
 /**
  * 
  */
+var getMessageIsRunning = false;
 var getMessage = function(channelId, currentMinTs) {
+	if (getMessageIsRunning) {
+		return;
+	}
+	getMessageIsRunning = true;
 	$.ajax('/slack-crawler/getMessages', {
 		'type' : 'GET',
 		'dataType' : 'json',
@@ -11,39 +16,46 @@ var getMessage = function(channelId, currentMinTs) {
 		}
 	}).done(
 			function(messages) {
+				var isFirstLoad = $('#messages').children().length == 0;
 				messages.forEach(function(message) {
 					$messageContainer = $('<div class="list-group">');
 					$message = $('<a class="list-group-item">').prependTo(
 							$messageContainer);
-					if (message.user) {
-						$('<h5 class="list-group-item-heading">').text(new Date(Number(message.ts.replace(/\..*/, '')) * 1000) + ' ' + (message.user.realName ? message.user.name + ' - ' + message.user.realName : message.user.name))
+					$('<h5 class="list-group-item-heading">').html((message.userRealName ? message.user + ' - ' + message.userRealName : message.user) + '<span class="message-date" style="float: right;">' + formatTs(message.ts) + '</span>')
 								.appendTo($message);
-					}
-					$('<p class="list-group-item-text">').html(toHtml(message.text, message.referencedUsers)).appendTo(
+					$('<p class="list-group-item-text">').html(message.text).appendTo(
 							$message);
 					$('#messages').prepend($messageContainer);
 				});
-				$('#messages').animate({ scrollTop: $('#messages')[0].scrollHeight }, 0);
-			});
+				if (isFirstLoad) {
+					$('#messages').animate({ scrollTop: $('#messages')[0].scrollHeight }, 0);
+				}
+				getMessageIsRunning = false;
+		}).fail(
+				function(error) {
+					console.log("getMessage is failed");
+					console.log(error);
+					getMessageIsRunning = false;
+				}
+		);
 }
 
-var toHtml = function(messageText, referencedUsers) {
-	var matches = messageText.match(/<@([A-Za-z0-9]+)(\|.*)?>/g);
-	var users = {};
-	if (referencedUsers) {
-		for ( var i in referencedUsers) {
-			users[referencedUsers[i].id] = referencedUsers[i];
-		}
-	}
-	for (var i in matches) {
-		var user = users[matches[i].replace(/<@([A-Za-z0-9]+)(\|.*)?>/, '$1')];
-		messageText = messageText.replace(matches[i], '<a>@' + user.name + '</a>');
-	}
-	return messageText.replace(/\r?\n/g, '<br/>');
+var toDoubleDigits = function(num) {
+	  num += "";
+	  if (num.length === 1) {
+	    num = "0" + num;
+	  }
+	 return num;     
+	};
+
+var formatTs = function(ts) {
+	var date = new Date(Number(ts.replace(/\..*/, '')) * 1000);
+	return date.getFullYear() + '/' + toDoubleDigits(date.getMonth() + 1) + '/' + toDoubleDigits(date.getDate()) + ' '
+		+ toDoubleDigits(date.getHours()) + ':' + toDoubleDigits(date.getMinutes()) + ':' + toDoubleDigits(date.getSeconds());
 }
 
 $(document).ready(function() {
-	// bind event on channels
+	// load messages in the channel when clicked
 	$('#channels').children().toArray().forEach(function(channel, index) {
 		$(channel).on('click', function(event) {
 			$('#messages').children().remove();
@@ -58,6 +70,14 @@ $(document).ready(function() {
 			getMessage(channelId, null);
 			localStorage.setItem('currentChannel', channelId);
 		});
+	});
+	
+	$('#messages').on('scroll', function(event) {
+		if ($('#messages').scrollTop() < 300) {
+			var ts = $('#messages').children().first().find('.message-body').attr('data-ts');
+			var channelId = localStorage.getItem('currentChannel');
+			getMessage(channelId, ts);
+		}
 	});
 	
 	// select channel

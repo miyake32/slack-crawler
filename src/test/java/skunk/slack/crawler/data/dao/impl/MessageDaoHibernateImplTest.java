@@ -38,7 +38,7 @@ public class MessageDaoHibernateImplTest extends AbstractHibernateDataAccessTest
 		message1.setType("message");
 		message1.setText("this is first message");
 		
-		messages.add(message1);
+		channel.addMessage(message1);
 		
 		messageDao.save(messages);
 		tx.commit();

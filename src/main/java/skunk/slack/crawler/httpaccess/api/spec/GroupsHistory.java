@@ -1,12 +1,9 @@
 package skunk.slack.crawler.httpaccess.api.spec;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
@@ -14,7 +11,8 @@ import com.google.gson.JsonObject;
 
 import skunk.slack.crawler.data.entity.model.Message;
 import skunk.slack.crawler.data.entity.model.User;
-import skunk.slack.crawler.service.UserService;
+import skunk.slack.crawler.service.data.UserService;
+import skunk.slack.crawler.util.MessageProcessor;
 import skunk.slack.crawler.util.parser.JsonElementType;
 
 public class GroupsHistory implements SlackAPISpec<Message> {
@@ -31,15 +29,7 @@ public class GroupsHistory implements SlackAPISpec<Message> {
 		if (Objects.nonNull(user)) {
 			message.setUser(this.userFetchService.getUser(user.getAsString()));
 		}
-		Pattern userRefPattern = Pattern.compile("<@([A-Za-z0-9]+)(\\|.*)?>");
-		Matcher userRefMatches = userRefPattern.matcher(text);
-		Set<User> referencedUsers = new HashSet<>();
-		while (userRefMatches.find()) {
-			User referencedUser = this.userFetchService.getUser(userRefMatches.group(1));
-			if (Objects.nonNull(referencedUser)) {
-				referencedUsers.add(referencedUser);
-			}
-		}
+		Set<User> referencedUsers = MessageProcessor.getReferencedUsers(message);
 		message.setReferencedUsers(referencedUsers);
 		return message;
 	};
