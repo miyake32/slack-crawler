@@ -29,6 +29,10 @@ public class MessageService {
 		return getMessages(channelId, count, TimeStampUtils.now());
 	}
 	
+	public List<Message> search(Collection<String> keywords, Collection<String> channelIds) {
+		return dao.search(keywords, channelIds);
+	}
+	
 	public void save(Collection<Message> messages) {
 		dao.save(messages);
 	}

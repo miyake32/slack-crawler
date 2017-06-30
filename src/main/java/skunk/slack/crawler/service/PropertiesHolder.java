@@ -43,6 +43,10 @@ public class PropertiesHolder {
 		return getProperty("token");
 	}
 
+	public static String getSecretPath() {
+		return getProperty("secret_path");
+	}
+
 	public static Set<String> getOpenChannels() {
 		String value = getProperty("open_channels");
 		log.info("open_channels : {}", value);

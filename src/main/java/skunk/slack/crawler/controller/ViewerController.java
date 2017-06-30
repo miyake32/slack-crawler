@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 
-import lombok.extern.slf4j.Slf4j;
 import skunk.slack.crawler.data.entity.model.Channel;
 import skunk.slack.crawler.data.entity.model.Message;
 import skunk.slack.crawler.service.PropertiesHolder;
@@ -72,7 +71,7 @@ public class ViewerController implements Controller {
 	@Override
 	public void setRoutes() {
 		Spark.get("/", getViewer(PropertiesHolder.getOpenChannels()), new ThymeleafTemplateEngine());
-		Spark.get("/secret/" + PropertiesHolder.getToken(), getViewer(null), new ThymeleafTemplateEngine());
+		Spark.get("/secret/" + PropertiesHolder.getSecretPath(), getViewer(null), new ThymeleafTemplateEngine());
 		Spark.get("/getMessages", getMessages);
 	}
 }

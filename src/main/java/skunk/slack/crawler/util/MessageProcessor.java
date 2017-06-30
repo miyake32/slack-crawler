@@ -30,11 +30,11 @@ public class MessageProcessor {
 	private static final String BOLD_REP = "<strong>$1</strong>";
 	private static final Pattern STRIKE = Pattern.compile("(?=\\s|^)~([^~]+)~");
 	private static final String STRIKE_REP = "<s>$1</s>";
-	private static final Pattern CODE = Pattern.compile("(?=\\s|^)`([^`]+)`");
+	private static final Pattern CODE = Pattern.compile("`([^`]+)`");
 	private static final String CODE_REP = "<code>$1</code>";
-	private static final Pattern PRE = Pattern.compile("\\n?```([^`]+)```\\n?", Pattern.MULTILINE);
+	private static final Pattern PRE = Pattern.compile("\\n?```\\n?([^`]+)\\n?```\\n?");
 	private static final String PRE_REP = "</p><div class='well'>$1</div><p>";
-	private static final Pattern QUOTE = Pattern.compile("(?<=^|\\n)>([^\\n]*)\\n?");
+	private static final Pattern QUOTE = Pattern.compile("(?m)^>([^\\n]*)\\n?$");
 	private static final String QUOTE_REP = "<blockquote>$1</blockquote>";
 	
 	private static final Pattern LT = Pattern.compile("(<)(?![^<]+>)");
@@ -59,7 +59,7 @@ public class MessageProcessor {
 		text = STRIKE.matcher(text).replaceAll(STRIKE_REP);
 		text = PRE.matcher(text).replaceAll(PRE_REP);
 		text = CODE.matcher(text).replaceAll(CODE_REP);
-		text = QUOTE.matcher(text).replaceAll(QUOTE_REP);
+//		text = QUOTE.matcher(text).replaceAll(QUOTE_REP);
 		text = text.replaceAll("</blockquote><blockquote>", "");
 
 		text = URL.matcher(text).replaceAll(URL_REP);
@@ -100,8 +100,8 @@ public class MessageProcessor {
 			}
 		}
 		
-		text = LT.matcher(text).replaceAll(LT_REP);
-		text = GT.matcher(text).replaceAll(GT_REP);
+//		text = LT.matcher(text).replaceAll(LT_REP);
+//		text = GT.matcher(text).replaceAll(GT_REP);
 		text = BR.matcher(text).replaceAll(BR_REP);
 		
 		builder.append(text);

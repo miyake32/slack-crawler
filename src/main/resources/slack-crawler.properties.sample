@@ -9,3 +9,6 @@ open_channels = channel1 channel2
 
 # specify channel names you don't want to fetch from slack. channel names should be separated by space
 excluded_channels = channel3 channel4
+
+# specify secret path to all channels viewer
+secret_path = your-secret-path
