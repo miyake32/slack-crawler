@@ -45,26 +45,6 @@ public class MessageProcessorTest {
 	}
 
 	@Test
-	public void slackVariablesTest() throws ParserConfigurationException {
-		String html = MessageProcessor.toHtml(TEST_MESSAGE);
-		Assert.assertEquals(
-				"<p class='message-body'data-ts='null' data-type='null' ><a class='referenced-user' data-user-id='U111111' title='Test User1'>@test1</a> testmessage<br/><a href='http://testurl.com' target='_blank'>http://testurl.com</a> was mensioned in <a class='referenced-user' data-user-id='C111111' title='test-channel1'>#test-channel1</a><br/><a class='referenced-user' data-user-id='U222222' title='Test User2'>@test2</a> Please look it.</p>",
-				html);
-	}
-	
-	@Test
-	public void boldTest() throws ParserConfigurationException {
-		Message message = Message.builder().text("aaa*bold text*bbb").build();
-		Assert.assertTrue(MessageProcessor.toHtml(message).contains("aaa<strong>bold text</strong>bbb"));
-	}
-	
-	@Test
-	public void italicTest() throws ParserConfigurationException {
-		Message message = Message.builder().text("aaa _italic text_ bbb_not_italic_ccc").build();
-		Assert.assertTrue(MessageProcessor.toHtml(message).contains("aaa <em>italic text</em> bbb_not_italic_ccc"));
-	}
-	
-	@Test
 	public void codeTest() throws ParserConfigurationException {
 		Message message = Message.builder().text("aaa`code text`bbb").build();
 		Assert.assertTrue(MessageProcessor.toHtml(message).contains("aaa<code>code text</code>bbb"));

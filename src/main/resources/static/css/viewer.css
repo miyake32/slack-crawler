@@ -1,1 +1,105 @@
 @CHARSET "UTF-8";
+
+html, body {
+  height: 100%;
+}
+
+.container-fluid {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  height: 100% !important;
+}
+
+.row {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  height: 100% !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+div.col-sm-3 {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  height: 100% !important;
+}
+
+#channels {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  margin-bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#channels .list-group-item {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#channel-name {
+  margin-left: 3px;
+  cursor: default;
+}
+
+#message-area {
+  height: 100%;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+#message-area .message-container {
+  height: 100%;
+  display: block;
+  margin-bottom: 0px;
+  border-radius: 0;
+}
+
+#message-area .message-container .panel-heading {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#message-area .message-container .panel-heading .search-switch-button {
+  position: fixed;
+  top: 4.5px;
+  right: 5px;
+}
+
+#message-area .message-container .panel-body {
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  bottom: 0;
+  top: 45px;
+  width: 75%;
+}
+
+#search-form {
+  position: fixed;
+  top: 4.5px;
+  right: 70px;
+  width: 25%;
+}
+
+small.message-date {
+  float: right;
+  margin-top: 2px;
+}
+
+.search-result-channel {
+  float: right;
+  margin-right: 10px;
+}
+
+#message-area .message-container#message-search {
+  display: none;
+}

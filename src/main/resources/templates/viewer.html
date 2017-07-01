@@ -1,76 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" style="height: 100%;">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>SlackViewer</title>
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-	crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://use.fontawesome.com/c230867484.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-	crossorigin="anonymous"></script>
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="/slack-crawler/js/viewer.js"></script>
+<link rel="stylesheet" type="text/css" href="/slack-crawler/css/viewer.css">
 
 </head>
-<body style="height: 100%;">
-	<div class="container-fluid"
-		style="padding-right: 0px; padding-left: 0px; height: 100%;">
-		<div class="row"
-			style="padding-right: 0px; padding-left: 0px; height: 100%; margin-left: 0px; margin-right: 0px;">
-			<div class="col-sm-3"
-				style="padding-right: 0px; padding-left: 0px; height: 100%;">
-				<div id="channels" class="list-group"
-					style="position: relative; top: 0; bottom: 0; left: 0; display: block; overflow-x: hidden; overflow-y: scroll; margin-bottom: 0; height: 100%; width: 100%;">
-					<a th:each="channel: ${channels}"
-						th:id="'channel-' + ${channel.id}"
-						class="list-group-item list-group-item-action"
-						style="border-bottom-right-radius: 0; border-bottom-left-radius: 0; border-top-left-radius: 0; border-top-right-radius: 0;"><i
-						th:if="${channel.type == 'PUBLIC_CHANNEL'}" class="fa fa-slack"
-						aria-hidden="true"></i><i
-						th:if="${channel.type == 'PRIVATE_CHANNEL'}" class="fa fa-key"
-						aria-hidden="true"></i> <i
-						th:if="${channel.type} == 'MULTIPARTY_DIRECT_MESSAGE'"
-						class="fa fa-users" aria-hidden="true"></i><i
-						th:if="${channel.type} == 'DIRECT_MESSAGE'" class="fa fa-user"
-						aria-hidden="true"></i><span th:text="${channel.name}"
-						style="margin-left: 3px;" /> </a>
-				</div>
-			</div>
-			<div id="message-view" class="col-sm-9"
-				style="height: 100%; padding-right: 0px; padding-left: 0px;">
-				<div class="panel panel-default"
-					style="height: 100%; display: block; margin-bottom: 0px; border-radius: 0;">
-					<div class="panel-heading"
-						style="border-top-left-radius: 0; border-top-right-radius: 0;">
-						<h3 id="active-channel-name" class="panel-title"></h3>
-						<button id="switch-to-search-button" type="button" class="btn btn-sm btn-default" style="position:fixed;top:4.5px;right:5px;">Search</button>
-					</div>
-					<div id="messages" class="panel-body"
-						style="display: block; overflow-x: hidden; overflow-y: auto; position: fixed; bottom: 0; top: 45px; width:75%;"></div>
-				</div>
-			</div>
-			<div id="message-search" class="col-sm-9" hidden="true"
-				style="height: 100%; padding-right: 0px; padding-left: 0px;">
-				<div class="panel panel-default"
-					style="height: 100%; display: block; margin-bottom: 0px; border-radius: 0;">
-					<div class="panel-heading"
-						style="border-top-left-radius: 0; border-top-right-radius: 0;">
-						<h3 id="active-channel-name" class="panel-title">Search</h3>
-						<form id='search-form' class="input-group input-group-sm" style="position: fixed;top: 4.5px;right: 70px;width: 25%;">
-      						<input id="search-input" type="text" class="form-control" placeholder="Username or Keyword...">
-      						<span class="input-group-btn">
-        						<button class="btn btn-default" type="submit">Go!</button>
-      						</span>
-    					</form>
-						<button id="close-search-button" type="button" class="btn btn-sm btn-default" style="position:fixed;top:4.5px;right:5px;">Close</button>
-					</div>
-					<div id="search-messages" class="panel-body"
-						style="display: block; overflow-x: hidden; overflow-y: auto; position: fixed; bottom: 0; top: 45px; width:75%;"></div>
-				</div>
-			</div>
-		</div>
-	</div>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3">
+        <div id="channels" class="list-group">
+          <a th:each="channel: ${channels}" th:id="'channel-' + ${channel.id}"
+            class="list-group-item list-group-item-action channel">
+            <i th:if="${channel.type == 'PUBLIC_CHANNEL'}" class="fa fa-slack" aria-hidden="true"></i>
+            <i th:if="${channel.type == 'PRIVATE_CHANNEL'}" class="fa fa-key" aria-hidden="true"></i>
+            <i th:if="${channel.type} == 'MULTIPARTY_DIRECT_MESSAGE'" class="fa fa-users" aria-hidden="true"></i>
+            <i th:if="${channel.type} == 'DIRECT_MESSAGE'" class="fa fa-user" aria-hidden="true"></i>
+            <span id="channel-name" th:text="${channel.name}"></span>
+          </a>
+        </div>
+      </div>
+      <div id="message-area" class="col-sm-9">
+        <div id="message-view" class="panel panel-default message-container">
+          <div class="panel-heading">
+            <h3 id="active-channel-name" class="panel-title"></h3>
+            <button id="switch-to-search-button" type="button" class="btn btn-sm btn-default search-switch-button">Search</button>
+          </div>
+          <div id="messages" class="panel-body"></div>
+        </div>
+        <div id="message-search" class="panel panel-default message-container">
+          <div class="panel-heading">
+            <h3 id="active-channel-name" class="panel-title">Search</h3>
+            <form id='search-form' class="input-group input-group-sm">
+              <input id="search-input" type="text" class="form-control" placeholder="Username or Keyword..."> <span
+                class="input-group-btn">
+                <button class="btn btn-default" type="submit">Go!</button>
+              </span>
+            </form>
+            <button id="close-search-button" type="button" class="btn btn-sm btn-default search-switch-button">Close</button>
+          </div>
+          <div id="search-messages" class="panel-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

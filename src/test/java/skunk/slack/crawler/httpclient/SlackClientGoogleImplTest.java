@@ -1,7 +1,6 @@
 package skunk.slack.crawler.httpclient;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;

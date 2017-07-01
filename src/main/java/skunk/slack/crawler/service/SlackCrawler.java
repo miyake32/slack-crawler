@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
+import skunk.slack.crawler.controller.ControllerInitializer;
 import skunk.slack.crawler.data.entity.model.Channel;
 import skunk.slack.crawler.data.entity.model.Message;
 
@@ -29,6 +30,7 @@ public class SlackCrawler {
 				log.error("Error occurred while fetching {}", channel.getName(), e);
 			}
 		}
+		new ControllerInitializer().init();
 		return exceptionCount;
 	}
 }
