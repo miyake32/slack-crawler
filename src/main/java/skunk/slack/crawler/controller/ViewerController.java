@@ -26,13 +26,13 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 public class ViewerController implements Controller {
 	private TemplateViewRoute getViewer(Set<String> channelNames) {
-		List<Channel> channels = ServiceFactory.getChannelService().getChannels().stream()
-				.filter(c -> Objects.isNull(channelNames) || channelNames.contains(c.getName()))
-				.sorted((a, b) -> a.getType().compareTo(b.getType()) * 100 + a.getName().compareTo(b.getName()))
-				.collect(Collectors.toList());
 		return new TemplateViewRoute() {
 			@Override
 			public ModelAndView handle(Request request, Response response) throws Exception {
+				List<Channel> channels = ServiceFactory.getChannelService().getChannels().stream()
+						.filter(c -> Objects.nonNull(channelNames) && channelNames.contains(c.getName()))
+						.sorted((a, b) -> a.getType().compareTo(b.getType()) * 100 + a.getName().compareTo(b.getName()))
+						.collect(Collectors.toList());
 				Map<String, Object> model = new HashMap<>();
 				model.put("channels", ModelCreator.createModelFromCollection(channels));
 
