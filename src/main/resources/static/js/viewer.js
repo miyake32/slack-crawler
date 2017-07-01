@@ -1,6 +1,6 @@
-///////////////////////////////////
+// /////////////////////////////////
 // Message related functions
-///////////////////////////////////
+// /////////////////////////////////
 var getMessageIsRunning = false;
 var getMessage = function(channelId, currentMinTs) {
   if (getMessageIsRunning) {
@@ -82,6 +82,57 @@ var reflectMessages = function(messages, messageArea) {
 };
 
 // ////////////////////////////////
+// User related functions
+// ////////////////////////////////
+// initialized in init process
+var users;
+
+var suggestUsers = function() {
+  var keyword = getKeyword();
+  $('#user-suggest-list').children().remove();
+  if (!keyword) {
+    return;
+  }
+  var valPrefix = '';
+  var valPrefixMatch = $('#search-input').val().match(/^.*\s(?=[^\s]+$)/);
+  if (valPrefixMatch) {
+    valPrefix = valPrefixMatch[0];
+  }
+  var userCand = users.search(keyword);
+  if (userCand.length === 1 && valPrefix + userCand[0] === $('#search-input').val()) {
+    return;
+  }
+  if (userCand.length > 5) {
+    userCand = userCand.slice(0, 5);
+  }
+  var html;
+  if (userCand.length === 1) {
+    html  = '<option value="' + valPrefix + userCand[0] + ' ">';
+  } else {
+    html = '<option value="' + valPrefix + userCand.join('" >' + '<option value="' + valPrefix) + ' ">';
+  }
+  $('#user-suggest-list').html(html);
+};
+
+var lastWordInInputCache;
+var getKeyword = function() {
+  var lastWordInInput;
+  var lastWordInInputMatch = $('#search-input').val().match(/[^\s]+$/);
+  if (lastWordInInputMatch) {
+    lastWordInInput = lastWordInInputMatch[0];
+  } else {
+    lastWordInInputCache = null;
+    return null;
+  }
+  if (lastWordInInput === lastWordInInputCache) {
+    return null;
+  } else {
+    lastWordInInputCache = lastWordInInput;
+    return lastWordInInput;
+  }
+};
+
+// ////////////////////////////////
 // Switch functions
 // ////////////////////////////////
 var toggleViewAndSearch = function(search) {
@@ -93,6 +144,8 @@ var toggleViewAndSearch = function(search) {
     $('#search-input').focus();
   } else {
     $('#message-search').hide();
+    $('#search-messages').children().remove();
+    $('#search-input').val('');
     $('#message-view').show();
     unbindChannelClick();
     bindGetMessageOnChanelClick();
@@ -155,6 +208,10 @@ var unbindChannelClick = function() {
   });
 };
 
+var bindSuggestUsersOnInput = function() {
+  $('#search-input').on('input', suggestUsers);
+};
+
 // ////////////////////////////////
 // Utility functions
 // ////////////////////////////////
@@ -171,10 +228,56 @@ var formatTs = function(ts) {
   return date.getFullYear() + '/' + toDoubleDigits(date.getMonth() + 1) + '/' + toDoubleDigits(date.getDate()) + ' '
       + toDoubleDigits(date.getHours()) + ':' + toDoubleDigits(date.getMinutes()) + ':'
       + toDoubleDigits(date.getSeconds());
+};
+
+var BinaryTree = function(value) {
+  this.value = value;
 }
+BinaryTree.prototype.add = function(value) {
+  var node = new BinaryTree(value);
+  if (this.value > node.value) {
+    if (this.lower) {
+      this.lower.add(value);
+    } else {
+      this.lower = node;
+    }
+  } else {
+    if (this.higher) {
+      this.higher.add(value);
+    } else {
+      this.higher = node;
+    }
+  }
+};
+BinaryTree.prototype.search = function(keyword) {
+  var ret = [];
+  if (!this.value) {
+    return ret;
+  }
+  if (this.value.startsWith(keyword)) {
+    ret.push(this.value);
+    if (this.lower) {
+      ret = ret.concat(this.lower.search(keyword));
+    }
+    if (this.higher) {
+      ret = ret.concat(this.higher.search(keyword));
+    }
+  } else {
+    if (this.value > keyword) {
+      if (this.lower) {
+        ret = ret.concat(this.lower.search(keyword));
+      }
+    } else {
+      if (this.higher) {
+        ret = ret.concat(this.higher.search(keyword));
+      }
+    }
+  }
+  return ret;
+};
 
 // ////////////////////////////////
-// executed after load
+// init process
 // ////////////////////////////////
 $(document).ready(function() {
   bindGetMessageOnChanelClick();
@@ -209,4 +312,22 @@ $(document).ready(function() {
   } else {
     $('#channels').children()[0].click();
   }
+
+  // retrieve users
+  $.ajax('/slack-crawler/user/all', {
+    'type' : 'GET',
+    'dataType' : 'json'
+  }).then(function(fetchedUsers) {
+    if (!fetchedUsers) {
+      return;
+    }
+    for (var i = 0; i < fetchedUsers.length; i++) {
+      if (i === 0) {
+        users = new BinaryTree(fetchedUsers[i].name);
+      } else {
+        users.add(fetchedUsers[i].name);
+      }
+    }
+    bindSuggestUsersOnInput();
+  });
 });

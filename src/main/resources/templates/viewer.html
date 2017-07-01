@@ -39,8 +39,11 @@
           <div class="panel-heading">
             <h3 id="active-channel-name" class="panel-title">Search</h3>
             <form id='search-form' class="input-group input-group-sm">
-              <input id="search-input" type="text" class="form-control" placeholder="Username or Keyword..."> <span
-                class="input-group-btn">
+              <input id="search-input" type="text" class="form-control" placeholder="Username or Keyword..."
+                autocomplete="off" list="user-suggest-list">
+              <datalist id="user-suggest-list">
+              </datalist>
+              <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">Go!</button>
               </span>
             </form>

@@ -13,7 +13,8 @@ public class ControllerInitializer implements SparkApplication {
 	private static final List<Controller> CONTROLLERS = Arrays.asList(
 			new CrawlerSwitchController(),
 			new ViewerController(),
-			new SearchController()
+			new SearchController(),
+			new UserController()
 			);
 
 	@Override

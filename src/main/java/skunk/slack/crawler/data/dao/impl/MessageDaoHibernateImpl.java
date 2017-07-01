@@ -100,10 +100,14 @@ public class MessageDaoHibernateImpl extends AbstractEntityDaoHibernateImpl<Mess
 		if (!keywords.isEmpty() && !userIds.isEmpty()) {
 			sql.append("AND ");
 		}
-		if (!userIds.isEmpty()) {
-			String userIdsStr = new StringBuilder("('").append(Joiner.on("','").join(userIds)).append("') ").toString();
-			sql.append("(m.user_id IN ").append(userIdsStr);
-			sql.append("OR u.referenced_users_id IN ").append(userIdsStr).append(")");
+		boolean isFirstUserId = true;
+		for (String userId : userIds) {
+			if (isFirstUserId) {
+				isFirstUserId = false;
+			} else {
+				sql.append("AND ");
+			}
+			sql.append("(m.user_id = '").append(userId).append("' OR u.referenced_users_id = '").append(userId).append("') "); 
 		}
 		sql.append(") AND m.channel_id IN ('").append(Joiner.on("','").join(channelIds)).append("') ");
 		sql.append("ORDER BY m.ts DESC");

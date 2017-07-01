@@ -22,8 +22,8 @@ public class MessageProcessor {
 	private static final Pattern REF_CHANNEL = Pattern.compile("<#([0-9A-Za-z]+)(\\|[^>]+)?>");
 	private static final Pattern URL = Pattern.compile("<(https?://[^>|]+)(\\|[^>]+)?>");
 	private static final String URL_REP = "<a href='$1' target='_blank'>$1</a>";
-	private static final Pattern VARIABLE = Pattern.compile("<!([a-zA-Z0-9]+)\\|@$1>");
-	private static final String VARIABLE_REP = "<a>$1</a>";
+	private static final Pattern VARIABLE = Pattern.compile("<!([a-zA-Z0-9]+)(\\|[^>]*)?>");
+	private static final String VARIABLE_REP = "<a>@$1</a>";
 	private static final Pattern ITALIC = Pattern.compile("(?=\\s|^)_([^_]+)_");
 	private static final String ITALIC_REP = "<em>$1</em>";
 	private static final Pattern BOLD = Pattern.compile("(?=\\s|^)\\*([^\\*]+)\\*");
