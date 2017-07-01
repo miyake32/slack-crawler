@@ -14,28 +14,19 @@ var getMessage = function(channelId, currentMinTs) {
       'channelId' : channelId,
       'currentMinTs' : currentMinTs
     }
-  }).done(
-      function(messages) {
-        var isFirstLoad = $('#messages').children().length == 0;
-        if (!isFirstLoad && $('#messages').scrollTop() == 0) {
-          $('#messages').scrollTop(1);
-        }
-        messages.forEach(function(message) {
-          $messageContainer = $('<div class="list-group">');
-          $message = $('<a class="list-group-item">').prependTo($messageContainer);
-          $('<h5 class="list-group-item-heading">').html(
-              (message.userRealName ? message.user + ' - ' + message.userRealName : message.user)
-                  + '<small class="message-date"">' + formatTs(message.ts) + '</small>').appendTo($message);
-          $('<p class="list-group-item-text">').html(message.text).appendTo($message);
-          $('#messages').prepend($messageContainer);
-        });
-        if (isFirstLoad) {
-          $('#messages').animate({
-            scrollTop : $('#messages')[0].scrollHeight
-          }, 0);
-        }
-        getMessageIsRunning = false;
-      }).fail(function(error) {
+  }).done(function(messages) {
+    var isFirstLoad = $('#messages').children().length == 0;
+    if (!isFirstLoad && $('#messages').scrollTop() == 0) {
+      $('#messages').scrollTop(1);
+    }
+    reflectMessages(messages, '#messages');
+    if (isFirstLoad) {
+      $('#messages').animate({
+        scrollTop : $('#messages')[0].scrollHeight
+      }, 0);
+    }
+    getMessageIsRunning = false;
+  }).fail(function(error) {
     console.log("getMessage is failed");
     console.log(error);
     getMessageIsRunning = false;
@@ -60,30 +51,39 @@ var searchMessage = function() {
       'channel' : channelIds,
       'keyword' : keyword
     }
-  }).done(
-      function(messages) {
-        messages.forEach(function(message) {
-          $messageContainer = $('<div class="list-group">');
-          $message = $('<a class="list-group-item">').prependTo($messageContainer);
-          $('<h5 class="list-group-item-heading">').html(
-              (message.userRealName ? message.user + ' - ' + message.userRealName : message.user)
-                  + '<small class="message-date">' + formatTs(message.ts)
-                  + '</small><span class="label label-primary search-result-channel">' + message.channelName
-                  + '</span>').appendTo($message);
-          $('<p class="list-group-item-text">').html(message.text).appendTo($message);
-          $('#search-messages').prepend($messageContainer);
-        });
-      }).fail(function(error) {
+  }).done(function(messages) {
+    reflectMessages(messages, '#search-messages');
+  }).fail(function(error) {
     console.log("searchMessage is failed");
     console.log(error);
   });
+};
 
-}
+var reflectMessages = function(messages, messageArea) {
+  messages.forEach(function(message) {
+    $messageContainer = $('<div class="list-group">');
+    $message = $('<a class="list-group-item">').prependTo($messageContainer);
 
+    var messageHeaderHtml = '';
+    if (message.user) {
+      messageHeaderHtml = messageHeaderHtml
+          + (message.userRealName ? message.user + ' - ' + message.userRealName : message.user);
+    }
+    messageHeaderHtml = messageHeaderHtml + '<small class="message-date">' + formatTs(message.ts) + '</small>';
+    if (message.channelName) {
+      messageHeaderHtml = messageHeaderHtml + '<span class="label label-primary search-result-channel">'
+          + message.channelName + '</span>';
+    }
 
-//////////////////////////////////
+    $('<h5 class="list-group-item-heading">').html(messageHeaderHtml).appendTo($message);
+    $('<p class="list-group-item-text">').html(message.text).appendTo($message);
+    $(messageArea).prepend($messageContainer);
+  });
+};
+
+// ////////////////////////////////
 // Switch functions
-//////////////////////////////////
+// ////////////////////////////////
 var toggleViewAndSearch = function(search) {
   if (search) {
     $('#message-view').hide();
@@ -187,13 +187,6 @@ $(document).ready(function() {
     }
   });
 
-  // select channel
-  if (localStorage.getItem('currentChannel')) {
-    $('#channel-' + localStorage.getItem('currentChannel')).click();
-  } else {
-    $('#channels').children()[0].click();
-  }
-
   // button
   $('#switch-to-search-button').on('click', function() {
     toggleViewAndSearch(true);
@@ -209,4 +202,11 @@ $(document).ready(function() {
 
   // start crawling
   $.ajax('/slack-crawler/crawler/enable');
+
+  // select channel
+  if (localStorage.getItem('currentChannel')) {
+    $('#channel-' + localStorage.getItem('currentChannel')).click();
+  } else {
+    $('#channels').children()[0].click();
+  }
 });
