@@ -10,7 +10,7 @@ html, body {
   height: 100% !important;
 }
 
-a.list-group-item:hover {
+#message-area a.list-group-item:hover {
    background-color: #fdfdff !important;
 }
 
