@@ -1,6 +1,5 @@
 package skunk.slack.crawler.data.dao.impl;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -36,7 +34,7 @@ public class MessageDaoHibernateImpl extends AbstractEntityDaoHibernateImpl<Mess
 			return (List<Message>) session.createCriteria(Message.class).add(Restrictions.eq("channel", channel))
 					.add(Restrictions.le("ts", maxTs)).addOrder(Order.desc("ts")).setMaxResults(count).list().stream()
 					.distinct().collect(Collectors.toList());
-		} catch (HibernateException | IOException e) {
+		} catch (Exception e) {
 			log.error("Failed to retrieve messages [channel:{},count:{},maxTs:{}]", channel.getName(), count, maxTs);
 			log.error("", e);
 			return null;
@@ -65,7 +63,7 @@ public class MessageDaoHibernateImpl extends AbstractEntityDaoHibernateImpl<Mess
 			String sql = createSql(keywordSet, userIds, channelIdSet);
 			return (List<Message>) session.createSQLQuery(sql.toString()).addEntity(Message.class).list().stream()
 					.distinct().collect(Collectors.toList());
-		} catch (HibernateException | IOException e) {
+		} catch (Exception e) {
 			log.error("Failed to retrieve messages [channels:{},keywords:{}]", channelIds, keywords);
 			log.error("", e);
 			return null;

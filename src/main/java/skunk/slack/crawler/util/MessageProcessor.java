@@ -95,7 +95,7 @@ public class MessageProcessor {
 				text = text.replace(channelRefMatches.group(), "<a class='referenced-user' data-user-id='"
 						+ channel.getId() + "' title='" + channel.getName() + "'>#" + channel.getName() + "</a>");
 			} else {
-				log.error("User is not found [referencedChannelId:{}, channelId: {}, messageTs:{}]", channel.getId(),
+				log.error("Channel is not found [referencedChannelId:{}, channelId: {}, messageTs:{}]", channelId,
 						message.getChannel().getId(), message.getTs());
 			}
 		}

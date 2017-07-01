@@ -1,8 +1,5 @@
 package skunk.slack.crawler.data.dao.impl;
 
-import java.io.IOException;
-
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -19,11 +16,12 @@ public class ChannelDaoHibernateImpl extends AbstractEntityDaoHibernateImpl<Chan
 		return Channel.class;
 	}
 
+	@SuppressWarnings({ "deprecation" })
 	@Override
 	public Channel get(String id) {
 		try (Session session = SessionFactory.openSession();) {
 			return (Channel) session.createCriteria(Channel.class).add(Restrictions.eq("id", id)).list().get(0);
-		} catch (HibernateException | IOException e) {
+		} catch (Exception e) {
 			log.error("Failed to retrieve channel [id:{}]", id, e);
 			return null;
 		}

@@ -1,5 +1,6 @@
 package skunk.slack.crawler.service.data;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import skunk.slack.crawler.data.entity.model.Channel;
 import skunk.slack.crawler.httpaccess.client.SlackClient;
 
 public class ChannelService {
+	private Map<String, Channel> channels = null;
 	private SlackClient slackClient;
 	private ChannelDao channelDao;
 
@@ -21,7 +23,9 @@ public class ChannelService {
 	}
 
 	public Set<Channel> getChannels(Predicate<Channel> filter) {
-		return channelDao.getAll().stream().filter(filter).collect(Collectors.toSet());
+		channels = channelDao.getAll().stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
+		return channels.values().stream().filter(filter).collect(Collectors.toSet());
+
 	}
 
 	public Set<Channel> fetchChannels(Predicate<Channel> filter) {
@@ -43,6 +47,9 @@ public class ChannelService {
 	}
 
 	public Channel getChannel(String id) {
-		return this.channelDao.get(id);
+		if (Objects.isNull(channels)) {
+			channels = channelDao.getAll().stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
+		}
+		return channels.get(id);
 	}
 }
