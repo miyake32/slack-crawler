@@ -10,6 +10,10 @@ html, body {
   height: 100% !important;
 }
 
+a.list-group-item:hover {
+   background-color: #fdfdff !important;
+}
+
 .well {
   margin-bottom: 10px !important;
   padding: 15px !important;

@@ -98,7 +98,23 @@ var suggestUsers = function() {
   if (valPrefixMatch) {
     valPrefix = valPrefixMatch[0];
   }
-  var userCand = users.search(keyword);
+
+  // don't show candidates if 2 users are already specified
+  // because of limitation of sql written in server-side logic
+  var valMatch = valPrefix.match(/[^\s]+/g);
+  var userCnt = 0;
+  if (valMatch) {
+    valMatch.forEach(function(val) {
+      if (users.contains(val)) {
+        userCnt++;
+      }
+    });
+  }
+  if (userCnt >= 2) {
+    return;
+  }
+
+  var userCand = users.prefixSearch(keyword);
   if (userCand.length === 1 && valPrefix + userCand[0] === $('#search-input').val()) {
     return;
   }
@@ -107,7 +123,7 @@ var suggestUsers = function() {
   }
   var html;
   if (userCand.length === 1) {
-    html  = '<option value="' + valPrefix + userCand[0] + ' ">';
+    html = '<option value="' + valPrefix + userCand[0] + ' ">';
   } else {
     html = '<option value="' + valPrefix + userCand.join('" >' + '<option value="' + valPrefix) + ' ">';
   }
@@ -249,7 +265,7 @@ BinaryTree.prototype.add = function(value) {
     }
   }
 };
-BinaryTree.prototype.search = function(keyword) {
+BinaryTree.prototype.prefixSearch = function(keyword) {
   var ret = [];
   if (!this.value) {
     return ret;
@@ -257,23 +273,41 @@ BinaryTree.prototype.search = function(keyword) {
   if (this.value.startsWith(keyword)) {
     ret.push(this.value);
     if (this.lower) {
-      ret = ret.concat(this.lower.search(keyword));
+      ret = ret.concat(this.lower.prefixSearch(keyword));
     }
     if (this.higher) {
-      ret = ret.concat(this.higher.search(keyword));
+      ret = ret.concat(this.higher.prefixSearch(keyword));
     }
   } else {
     if (this.value > keyword) {
       if (this.lower) {
-        ret = ret.concat(this.lower.search(keyword));
+        ret = ret.concat(this.lower.prefixSearch(keyword));
       }
     } else {
       if (this.higher) {
-        ret = ret.concat(this.higher.search(keyword));
+        ret = ret.concat(this.higher.prefixSearch(keyword));
       }
     }
   }
   return ret;
+};
+BinaryTree.prototype.contains = function(keyword) {
+  if (this.value === keyword) {
+    return true;
+  }
+  if (this.value > keyword) {
+    if (this.lower) {
+      return this.lower.contains(keyword);
+    } else {
+      return false;
+    }
+  } else {
+    if (this.higher) {
+      return this.higher.contains(keyword);
+    } else {
+      return false;
+    }
+  }
 };
 
 // ////////////////////////////////
