@@ -30,7 +30,7 @@ public class ViewerController implements Controller {
 			@Override
 			public ModelAndView handle(Request request, Response response) throws Exception {
 				List<Channel> channels = ServiceFactory.getChannelService().getChannels().stream()
-						.filter(c -> Objects.nonNull(channelNames) && channelNames.contains(c.getName()))
+						.filter(c -> Objects.isNull(channelNames) || channelNames.contains(c.getName()))
 						.sorted((a, b) -> a.getType().compareTo(b.getType()) * 100 + a.getName().compareTo(b.getName()))
 						.collect(Collectors.toList());
 				Map<String, Object> model = new HashMap<>();
