@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +19,11 @@ import skunk.slack.crawler.service.ServiceFactory;
 
 @Slf4j
 public class MessageProcessor {
-	private static final Pattern REF_USER = Pattern.compile("<@([0-9A-Za-z]+)(\\|[^>]+)?>");
-	private static final Pattern REF_CHANNEL = Pattern.compile("<#([0-9A-Za-z]+)(\\|[^>]+)?>");
-	private static final Pattern URL = Pattern.compile("<(https?://[^>|]+)(\\|[^>]+)?>");
-	private static final String URL_REP = "<a href='$1' target='_blank'>$1</a>";
+	private static final Pattern REF_USER = Pattern.compile("<@([0-9A-Za-z]+)(?:\\|([^>]+))?>");
+	private static final Pattern REF_CHANNEL = Pattern.compile("<#([0-9A-Za-z]+)(?:\\|([^>]+))?>");
+	private static final Pattern URL = Pattern.compile("<(https?://[^>|]+)(?:\\|([^>]+))?>");
+	private static final String URL_REP1 = "<a href='$1' target='_blank'>$1</a>";
+	private static final String URL_REP2 = "<a href='$1' target='_blank'>$2</a>";
 	private static final Pattern VARIABLE = Pattern.compile("<!([a-zA-Z0-9]+)(\\|[^>]*)?>");
 	private static final String VARIABLE_REP = "<a>@$1</a>";
 	private static final Pattern ITALIC = Pattern.compile("(?=\\s|^)_([^_]+)_");
@@ -34,13 +36,12 @@ public class MessageProcessor {
 	private static final String CODE_REP = "<code>$1</code>";
 	private static final Pattern PRE = Pattern.compile("\\n?```\\n?([^`]+)\\n?```\\n?");
 	private static final String PRE_REP = "</p><div class='well'>$1</div><p>";
-	private static final Pattern QUOTE = Pattern.compile("(?m)^>([^\\n]*)\\n?$");
-	private static final String QUOTE_REP = "<blockquote>$1</blockquote>";
-	
-	private static final Pattern LT = Pattern.compile("(<)(?![^<]+>)");
-	private static final String LT_REP = "&lt;";
-	private static final Pattern GT = Pattern.compile("(?<!<[^>]{1,100})(>)");
-	private static final String GT_REP = "&gt;";
+//	private static final Pattern QUOTE = Pattern.compile("(?m)^>([^\\n]*)\\n?$");
+//	private static final String QUOTE_REP = "<blockquote>$1</blockquote>";
+//	private static final Pattern LT = Pattern.compile("(<)(?![^<]+>)");
+//	private static final String LT_REP = "&lt;";
+//	private static final Pattern GT = Pattern.compile("(?<!<[^>]{1,100})(>)");
+//	private static final String GT_REP = "&gt;";
 	private static final Pattern BR = Pattern.compile("\\n");
 	private static final String BR_REP = "<br/>";
 
@@ -53,22 +54,33 @@ public class MessageProcessor {
 		builder.append(">");
 
 		String text = message.getText();
-		
+
 		text = ITALIC.matcher(text).replaceAll(ITALIC_REP);
 		text = BOLD.matcher(text).replaceAll(BOLD_REP);
 		text = STRIKE.matcher(text).replaceAll(STRIKE_REP);
 		text = PRE.matcher(text).replaceAll(PRE_REP);
 		text = CODE.matcher(text).replaceAll(CODE_REP);
-//		text = QUOTE.matcher(text).replaceAll(QUOTE_REP);
+		// text = QUOTE.matcher(text).replaceAll(QUOTE_REP);
 		text = text.replaceAll("</blockquote><blockquote>", "");
 
-		text = URL.matcher(text).replaceAll(URL_REP);
+		Matcher urlMatcher = URL.matcher(text);
+		StringBuffer sb = new StringBuffer();
+		urlMatcher.reset();
+		while (urlMatcher.find()) {
+			if (urlMatcher.groupCount() == 1 || (urlMatcher.groupCount() > 1 && Strings.isNullOrEmpty(urlMatcher.group(2)))) {
+				urlMatcher.appendReplacement(sb, URL_REP1);
+			} else if (urlMatcher.groupCount() == 2) {
+				urlMatcher.appendReplacement(sb, URL_REP2);
+			}
+		}
+		urlMatcher.appendTail(sb);
+		text = sb.toString();
+		
 		text = VARIABLE.matcher(text).replaceAll(VARIABLE_REP);
 
 		Map<String, User> users = Maps.newHashMap();
 		if (Objects.nonNull(message.getReferencedUsers())) {
-			 users = message.getReferencedUsers().stream()
-					.collect(Collectors.toMap(m -> m.getId(), m -> m));
+			users = message.getReferencedUsers().stream().collect(Collectors.toMap(m -> m.getId(), m -> m));
 		}
 		Matcher userRefMatches = REF_USER.matcher(text);
 		while (userRefMatches.find()) {
@@ -76,6 +88,9 @@ public class MessageProcessor {
 			User referencedUser = users.get(userId);
 			if (Objects.isNull(referencedUser)) {
 				referencedUser = ServiceFactory.getUserService().getUser(userId);
+			}
+			if (Objects.isNull(referencedUser) && userRefMatches.groupCount() == 2) {
+				referencedUser = User.builder().id(userId).name(userRefMatches.group(2)).realName("").build();
 			}
 			if (Objects.nonNull(referencedUser)) {
 				text = text.replace(userRefMatches.group(),
@@ -91,6 +106,9 @@ public class MessageProcessor {
 		while (channelRefMatches.find()) {
 			String channelId = channelRefMatches.group(1);
 			Channel channel = ServiceFactory.getChannelService().getChannel(channelId);
+			if (Objects.isNull(channel) && channelRefMatches.groupCount() == 2) {
+				channel = Channel.builder().id(channelId).name(channelRefMatches.group(2)).build();
+			}
 			if (Objects.nonNull(channel)) {
 				text = text.replace(channelRefMatches.group(), "<a class='referenced-user' data-user-id='"
 						+ channel.getId() + "' title='" + channel.getName() + "'>#" + channel.getName() + "</a>");
@@ -99,11 +117,11 @@ public class MessageProcessor {
 						message.getChannel().getId(), message.getTs());
 			}
 		}
-		
-//		text = LT.matcher(text).replaceAll(LT_REP);
-//		text = GT.matcher(text).replaceAll(GT_REP);
+
+		// text = LT.matcher(text).replaceAll(LT_REP);
+		// text = GT.matcher(text).replaceAll(GT_REP);
 		text = BR.matcher(text).replaceAll(BR_REP);
-		
+
 		builder.append(text);
 		builder.append("</p>");
 
