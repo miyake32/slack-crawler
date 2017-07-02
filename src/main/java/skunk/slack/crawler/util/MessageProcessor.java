@@ -89,7 +89,7 @@ public class MessageProcessor {
 			if (Objects.isNull(referencedUser)) {
 				referencedUser = ServiceFactory.getUserService().getUser(userId);
 			}
-			if (Objects.isNull(referencedUser) && userRefMatches.groupCount() == 2) {
+			if (Objects.isNull(referencedUser) && userRefMatches.groupCount() == 2 && !Strings.isNullOrEmpty(userRefMatches.group(2))) {
 				referencedUser = User.builder().id(userId).name(userRefMatches.group(2)).realName("").build();
 			}
 			if (Objects.nonNull(referencedUser)) {
@@ -106,7 +106,7 @@ public class MessageProcessor {
 		while (channelRefMatches.find()) {
 			String channelId = channelRefMatches.group(1);
 			Channel channel = ServiceFactory.getChannelService().getChannel(channelId);
-			if (Objects.isNull(channel) && channelRefMatches.groupCount() == 2) {
+			if (Objects.isNull(channel) && channelRefMatches.groupCount() == 2 && !Strings.isNullOrEmpty(channelRefMatches.group(2))) {
 				channel = Channel.builder().id(channelId).name(channelRefMatches.group(2)).build();
 			}
 			if (Objects.nonNull(channel)) {
