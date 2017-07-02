@@ -103,10 +103,12 @@ var suggestUsers = function() {
   // because of limitation of sql written in server-side logic
   var valMatch = valPrefix.match(/[^\s]+/g);
   var userCnt = 0;
+  var usersInVal = [];
   if (valMatch) {
     valMatch.forEach(function(val) {
       if (users.contains(val)) {
         userCnt++;
+        usersInVal.push(val);
       }
     });
   }
@@ -114,7 +116,14 @@ var suggestUsers = function() {
     return;
   }
 
-  var userCand = users.prefixSearch(keyword);
+  var userCand = users.prefixSearch(keyword); {
+    usersInVal.forEach(function(user) {
+      var index = userCand.indexOf(user);
+      if (index > -1) {
+        userCand = userCand.slice(0, index).concat(userCand.slice(index + 1, userCand.length));
+      }
+    });
+  }
   if (userCand.length === 1 && valPrefix + userCand[0] === $('#search-input').val()) {
     return;
   }
